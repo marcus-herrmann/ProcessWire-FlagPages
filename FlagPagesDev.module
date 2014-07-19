@@ -1,6 +1,6 @@
 <?php
 
-class FlagPages extends WireData implements Module {
+class FlagPagesDev extends WireData implements Module {
 
 	public static function getModuleInfo() {
 		return array(
@@ -48,13 +48,14 @@ class FlagPages extends WireData implements Module {
 		$this->message("Module is uninstalled");
 	}
 
-	public function init() {
-		$this->addHookAfter('Page::render', $this, 'example2');
-	}
 
-	public function renderFlagLink($page, $labelAdd, $labelRemove) {
+
+	public function renderLink($labelAdd, $labelRemove) {
 
 		$user = $this->user;
+		$input = $this->input;
+		$page = $this->page;
+		$pages = $this->pages;
 
 		if ($user->isLoggedin()) {
 
@@ -62,34 +63,28 @@ class FlagPages extends WireData implements Module {
 
 			$label = ($userFlaggedPages->has($page) ? $labelRemove : $labelAdd);
 
-			echo "<a href='{$page->url}?p={$page->id}&u={$user->id}'>{$label}</a>";
+			echo "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
 
+
+			if ($input->get) {
+				$p = $input->get("flag");
+
+				$user->setOutputFormatting(false);
+
+				if ($userFlaggedPages->has($pages->get($p))) {
+					$userFlaggedPages->remove($pages->get($p));
+				} else {
+					$userFlaggedPages->add($pages->get($p));
+				}
+
+				$user->save();
+			}
 		}
 	}
 
-	public function example2($event) {
+	public function listFlaggedPages() {}
 
-		$page = $event->object;
-
-		// don't add this to the admin pages
-		if($page->template == 'admin') return;
-
-		if ($input->get) {
-			$event->return = str_replace("</body>", "<p>Es gibt was in der URL!</p></body>", $event->return);
-		};
-
-	//		$user->setOutputFormatting(false);
-	//
-	//		if ($userBookmarks->has($page)) {
-	//			$userBookmarks->remove($page);
-	//		} else {
-	//			$userBookmarks->add($page);
-	//		}
-	//
-	//		$user->save();
-	//		$session->redirect($page->url);
-
-
+	public function init() {
 	}
 
 }
