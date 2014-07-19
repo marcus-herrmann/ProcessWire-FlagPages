@@ -1,0 +1,53 @@
+<?php
+
+class FlagPages extends WireData implements Module {
+
+	public static function getModuleInfo() {
+		return array(
+			"title" => "FlagPages",
+			"version" => 001,
+			"summary" => "Let logged in user flag your content",
+			"autoload" => false
+		);
+	}
+
+	public function install() {
+
+		/*
+		 * Create flaggedpages field and assign it to user template
+		 */
+
+		$f = new Field();
+		$f->type = $this->modules->get("FieldtypePage");
+		$f->name = "flaggedpages";
+		$f->label = "Flagged Pages";
+		$f->description = "References to flagged pages ";
+		//$f->inputfield = $input;
+		$f->save();
+
+		$fg = $this->fieldgroups->get('user');
+		$fg->add($f);
+		$fg->save();
+
+		$this->message("Module is installed");
+
+	}
+
+	public function uninstall() {
+
+		/*
+ 		* Delete flaggedpages field
+ 		*/
+
+		$fp = $this->fields->get("flaggedpages");
+		$fg = $this->fieldgroups->get('user');
+		$fg->remove($fp);
+		$fg->save();
+		//$fp->delete(); @TODO delete flaggedpages completely
+
+		$this->message("Module is uninstalled");
+	}
+
+	public function init() {}
+
+}
