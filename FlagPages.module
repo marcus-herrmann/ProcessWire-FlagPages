@@ -6,8 +6,9 @@ class FlagPages extends WireData implements Module {
 		return array(
 			"title" => "FlagPages",
 			"version" => 001,
-			"summary" => "Let logged in user flag your content",
-			"autoload" => false
+			"summary" => "Lets logged in user flag your content",
+			"autoload" => false,
+			"singular" => true
 		);
 	}
 
@@ -22,7 +23,6 @@ class FlagPages extends WireData implements Module {
 		$f->name = "flaggedpages";
 		$f->label = "Flagged Pages";
 		$f->description = "References to flagged pages ";
-		//$f->inputfield = $input;
 		$f->save();
 
 		$fg = $this->fieldgroups->get('user');
@@ -48,6 +48,48 @@ class FlagPages extends WireData implements Module {
 		$this->message("Module is uninstalled");
 	}
 
-	public function init() {}
+	public function init() {
+		$this->addHookAfter('Page::render', $this, 'example2');
+	}
+
+	public function renderFlagLink($page, $labelAdd, $labelRemove) {
+
+		$user = $this->user;
+
+		if ($user->isLoggedin()) {
+
+			$userFlaggedPages = $this->user->flaggedpages;
+
+			$label = ($userFlaggedPages->has($page) ? $labelRemove : $labelAdd);
+
+			echo "<a href='{$page->url}?p={$page->id}&u={$user->id}'>{$label}</a>";
+
+		}
+	}
+
+	public function example2($event) {
+
+		$page = $event->object;
+
+		// don't add this to the admin pages
+		if($page->template == 'admin') return;
+
+		if ($input->get) {
+			$event->return = str_replace("</body>", "<p>Es gibt was in der URL!</p></body>", $event->return);
+		};
+
+	//		$user->setOutputFormatting(false);
+	//
+	//		if ($userBookmarks->has($page)) {
+	//			$userBookmarks->remove($page);
+	//		} else {
+	//			$userBookmarks->add($page);
+	//		}
+	//
+	//		$user->save();
+	//		$session->redirect($page->url);
+
+
+	}
 
 }
