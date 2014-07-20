@@ -5,7 +5,7 @@
  * Flag Pages Module
  *
  * @author Marcus
- * https://github.com/somatonic/MarkupSimpleNavigation
+ * https://github.com/marcus-herrmann/FlagPages
  *
  * @date_created 07/19/2014
  *
@@ -18,13 +18,13 @@
  *
  */
 
-class FlagPagesDev extends WireData implements Module {
+class FlagPages extends WireData implements Module {
 
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
 			"version" => 001,
-			"summary" => "Lets logged in user flag your content",
+			"summary" => "Lets logged-in user flag page content",
 			"autoload" => false,
 			"singular" => true
 		);
@@ -79,15 +79,14 @@ class FlagPagesDev extends WireData implements Module {
 		$page = $this->page;
 		$pages = $this->pages;
 		$session = $this->session;
+		$userFlaggedPages = $this->user->flaggedpages;
 
 		if ($user->isLoggedin()) {
-
-			$userFlaggedPages = $this->user->flaggedpages;
 
 			$prefix = ($userFlaggedPages->has($page) ? $prefixRemove : $prefixAdd);
 			$suffix = ($userFlaggedPages->has($page) ? $suffixRemove : $suffixAdd);
 
-			echo "<a href='{$page->url}?flag={$page->id}'>{$prefix} {$page->title} {$suffix}</a>"; // @TODO post instead of get
+			echo "<a href='{$page->url}?flag={$page->id}'>{$prefix} {$page->title} {$suffix}</a>";
 
 
 			if ($input->get("flag")) {
@@ -108,7 +107,7 @@ class FlagPagesDev extends WireData implements Module {
 		}
 	}
 
-	public function listFlaggedPages($labelRemove) {
+	public function renderList() {
 
 		/*
  		 * Provide a list for navigating to, and removing user's flags
@@ -116,15 +115,15 @@ class FlagPagesDev extends WireData implements Module {
 
 		$userFlaggedPages = $this->user->flaggedpages;
 
-		$label = ($labelRemove ? $labelRemove : 'Remove');
 
 		if ($this->user->isLoggedin() && $userFlaggedPages) {
 
 			echo "<ul>";
+
 			foreach($userFlaggedPages as $f) {
-				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a>
-						(<a href='" . $f->url . "?flag={$f->id}' >{$label}</a>)</li>"; // @TODO post instead of get
+				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a></li>";
 			}
+
 			echo "</ul>";
 		}
 
