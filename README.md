@@ -1,4 +1,4 @@
-FlagPages 0.1.0
+FlagPages 0.1.1
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -21,21 +21,14 @@ $flags = $modules->get("FlagPages");
 Then, use the renderLink method and place the output in your template. By adding the link to all or just certain templates, you can control which templates can be flagged and which can't.
 
 ```
-echo $flags->renderLink("Add", "Remove", "to flags", "from flags");
+echo $flag->renderLink();
 ```
 
-This will output e.g. "Add About to flags", or "Remove About from flags".
-
-You can control the link text via parameters, but be aware of the switch function of this link - so always provide labels indicating adding and removing. If you are using this module in non-English contexts, you are able to change the sentence structure like so:
+The default output will be "Add {Name} to flags", or "Remove {Name} from flags". You can override these labels with parameters. For example:
 
 ```
-echo $flags->renderLink(null, null, "zu Flags hinzufügen", "von Flags entfernen");
+echo $flag->renderLink("Add %s to my bookmarks", "Remove %s from my bookmarks");
 ```
-
-This will output e.g. "About zu Flags hinzufügen", or "About von Flags entfernen".
-
-
-Basically, the link label structure is ` {prefix} {page->title} {suffix} ` .
 
 
 ### Rendering the flagged pages list
@@ -64,6 +57,9 @@ This will output a simple unordered list with links to pages the currently logge
 https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
+
+### 0.1.1
+Simplified renderList() param logic (thanks, [teppo](https://processwire.com/talk/topic/7044-release-flagpages/#entry67965))
 
 ### 0.1.0
 Add basic functionality
