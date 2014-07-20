@@ -24,7 +24,7 @@ Then, use the renderLink method and place the output in your template. By adding
 echo $flags->renderLink("Add", "Remove", "to flags", "from flags");
 ```
 
-This will output "Add About to flags", or "Remove About from flags".
+This will output e.g. "Add About to flags", or "Remove About from flags".
 
 You can control the link text via parameters, but be aware of the switch function of this link - so always provide labels indicating adding and removing. If you are using this module in non-English contexts, you are able to change the sentence structure like so:
 
@@ -59,6 +59,9 @@ This will output a simple unordered list with links to pages the currently logge
 
 ### By Module Class Name
 *Coming Soon*
+
+## Forum topic
+https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
 
