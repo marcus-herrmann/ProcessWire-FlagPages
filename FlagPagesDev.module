@@ -68,23 +68,29 @@ class FlagPagesDev extends WireData implements Module {
 
 
 
-	public function renderLink($labelAdd, $labelRemove) {
+	public function renderLink($prefixAdd, $prefixRemove, $suffixAdd, $suffixRemove) {
+
+		/*
+		 * Render link switch to flag/unflag pages
+		 */
 
 		$user = $this->user;
 		$input = $this->input;
 		$page = $this->page;
 		$pages = $this->pages;
+		$session = $this->session;
 
 		if ($user->isLoggedin()) {
 
 			$userFlaggedPages = $this->user->flaggedpages;
 
-			$label = ($userFlaggedPages->has($page) ? $labelRemove : $labelAdd);
+			$prefix = ($userFlaggedPages->has($page) ? $prefixRemove : $prefixAdd);
+			$suffix = ($userFlaggedPages->has($page) ? $suffixRemove : $suffixAdd);
 
-			echo "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
+			echo "<a href='{$page->url}?flag={$page->id}'>{$prefix} {$page->title} {$suffix}</a>"; // @TODO post instead of get
 
 
-			if ($input->get) {
+			if ($input->get("flag")) {
 				$p = $input->get("flag");
 
 				$user->setOutputFormatting(false);
@@ -96,23 +102,34 @@ class FlagPagesDev extends WireData implements Module {
 				}
 
 				$user->save();
+				$session->redirect($pages->get($p)->url);
+
 			}
 		}
 	}
 
-	public function listFlaggedPages() {
+	public function listFlaggedPages($labelRemove) {
+
+		/*
+ 		 * Provide a list for navigating to, and removing user's flags
+ 		 */
 
 		$userFlaggedPages = $this->user->flaggedpages;
 
+		$label = ($labelRemove ? $labelRemove : 'Remove');
+
 		if ($this->user->isLoggedin() && $userFlaggedPages) {
+
+			echo "<ul>";
 			foreach($userFlaggedPages as $f) {
-				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a> (<a href='" . $f->url . "?flag={$f->id}' >Entfernen</a>)</li>";
+				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a>
+						(<a href='" . $f->url . "?flag={$f->id}' >{$label}</a>)</li>"; // @TODO post instead of get
 			}
+			echo "</ul>";
 		}
 
 	}
 
-	public function init() {
-	}
+	public function init() {}
 
 }
