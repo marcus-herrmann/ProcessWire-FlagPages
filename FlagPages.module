@@ -23,7 +23,7 @@ class FlagPages extends WireData implements Module {
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
-			"version" => 001,
+			"version" => 010,
 			"summary" => "Lets logged-in user flag page content",
 			"autoload" => false,
 			"singular" => true
