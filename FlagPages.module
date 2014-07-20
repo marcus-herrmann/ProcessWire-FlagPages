@@ -30,6 +30,22 @@ class FlagPages extends WireData implements Module {
 		);
 	}
 
+	public static function getModuleConfigInputfields(array $data) {
+		$fields = new InputfieldWrapper();
+
+		$modules = wire('modules');
+
+		$field = $modules->get("InputfieldText");
+		$field->attr('name', 'flaggingUserRoles');
+		$field->attr('value', $data['flaggingUserRoles']);
+		$field->label = "User roles that are allowed to flag";
+		$field->description = "";
+		$fields->add($field);
+
+		return $fields;
+
+	}
+
 	public function install() {
 
 		/*

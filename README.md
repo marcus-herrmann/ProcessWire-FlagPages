@@ -1,4 +1,4 @@
-FlagPages 0.1.0
+FlagPages 0.1.1
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -58,7 +58,7 @@ https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
 
-### 0.2.0
+### 0.1.1
 Simplified renderList() param logic (thanks, [teppo](https://processwire.com/talk/topic/7044-release-flagpages/#entry67965))
 
 ### 0.1.0
