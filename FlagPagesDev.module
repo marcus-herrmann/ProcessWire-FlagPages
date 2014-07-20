@@ -1,5 +1,23 @@
 <?php
 
+/**
+ *
+ * Flag Pages Module
+ *
+ * @author Marcus
+ * https://github.com/somatonic/MarkupSimpleNavigation
+ *
+ * @date_created 07/19/2014
+ *
+ * ProcessWire 2.x
+ * Copyright (C) 2011 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+
 class FlagPagesDev extends WireData implements Module {
 
 	public static function getModuleInfo() {
@@ -82,7 +100,17 @@ class FlagPagesDev extends WireData implements Module {
 		}
 	}
 
-	public function listFlaggedPages() {}
+	public function listFlaggedPages() {
+
+		$userFlaggedPages = $this->user->flaggedpages;
+
+		if ($this->user->isLoggedin() && $userFlaggedPages) {
+			foreach($userFlaggedPages as $f) {
+				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a> (<a href='" . $f->url . "?flag={$f->id}' >Entfernen</a>)</li>";
+			}
+		}
+
+	}
 
 	public function init() {
 	}
