@@ -68,7 +68,7 @@ class FlagPages extends WireData implements Module {
 
 
 
-	public function renderLink($prefixAdd, $prefixRemove, $suffixAdd, $suffixRemove) {
+	public function renderLink($add, $remove) {
 
 		/*
 		 * Render link switch to flag/unflag pages
@@ -81,12 +81,17 @@ class FlagPages extends WireData implements Module {
 		$session = $this->session;
 		$userFlaggedPages = $this->user->flaggedpages;
 
+		$add = ($add ? $add : "Add %s to flags");
+		$remove = ($remove ? $remove : "Remove %s from flags");
+
+		$addLabel = sprintf($add, $page->title);
+		$removeLabel = sprintf($remove, $page->title);
+
 		if ($user->isLoggedin()) {
 
-			$prefix = ($userFlaggedPages->has($page) ? $prefixRemove : $prefixAdd);
-			$suffix = ($userFlaggedPages->has($page) ? $suffixRemove : $suffixAdd);
+			$label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
 
-			echo "<a href='{$page->url}?flag={$page->id}'>{$prefix} {$page->title} {$suffix}</a>";
+			echo "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
 
 
 			if ($input->get("flag")) {
