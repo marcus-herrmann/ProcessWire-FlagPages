@@ -4,6 +4,8 @@ FlagPages 0.1.0
 Module for ProcessWire: lets logged-in users flag pages.
 Proof of concept - do not use in production environments without testing thoroughly.
 
+![Example Screenshot](http://assets.marcus-herrmann.com/FlagPages/flagscreen.jpg)
+
 ## Usage
 
 FlagPages module consists of two parts: Rendering the link and rendering a list with your current bookmarks.
@@ -46,6 +48,8 @@ This will output a simple unordered list with links to pages the currently logge
 
 
 ## Installation
+
+* Requirement: ProcessWire 2.4 (although I haven't tested it in older versions, frankly)
 
 ### Manually
 
