@@ -2,6 +2,9 @@ FlagPages 0.1.1
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
+
+**With this module, a logged in user can flag/unflag pages, on whose template the flag link (see below) has been placed. These flags serve as "personal bookmarks" and are not a site-wide sticky setting.**
+
 Proof of concept - do not use in production environments without testing thoroughly.
 
 ![Example Screenshot](http://assets.marcus-herrmann.com/FlagPages/flagscreen.jpg)
@@ -43,6 +46,10 @@ This will output a simple unordered list with links to pages the currently logge
 ## Installation
 
 * Requirement: ProcessWire 2.4 (although I haven't tested it in older versions, frankly)
+
+### Within module area in ProcessWire Backend
+
+Click "New" and search for `FlagPages` class name.
 
 ### Manually
 
