@@ -18,7 +18,7 @@
  *
  */
 
-class FlagPages extends WireData implements Module {
+class FlagPages extends WireData implements Module, ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
@@ -26,16 +26,29 @@ class FlagPages extends WireData implements Module {
 			"version" => 011,
 			"summary" => "Lets logged-in user flag page content",
 			"autoload" => false,
-			"singular" => true
+			"singular" => false
 		);
 	}
+
+//	public function __construct() {
+//		foreach (self::$defaultSettings as $key => $value) {
+//			$this->set($key, $value);
+//		}
+//	}
+
+//	protected static $defaultSettings = array(
+//		'engine' => '',
+//		'api_var' => 'view',
+//		'registered_engines' => array(),
+//		'active' => true,
+//	);
 
 	public static function getModuleConfigInputfields(array $data) {
 		$fields = new InputfieldWrapper();
 
 		$modules = wire('modules');
 
-		$field = $modules->get("InputfieldText");
+		$field = $modules->get("InputfieldAsmSelect");
 		$field->attr('name', 'flaggingUserRoles');
 		$field->attr('value', $data['flaggingUserRoles']);
 		$field->label = "User roles that are allowed to flag";
@@ -151,5 +164,6 @@ class FlagPages extends WireData implements Module {
 	}
 
 	public function init() {}
+
 
 }
