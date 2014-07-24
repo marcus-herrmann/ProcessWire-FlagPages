@@ -18,33 +18,35 @@
  *
  */
 
-class FlagPages extends WireData implements Module {
+require_once 'includes/autoload.php';
+
+class FlagPages extends WireData implements Module, ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
 			"version" => 011,
-			"summary" => "Lets logged-in user flag page content",
-			"autoload" => false,
-			"singular" => true
+			"summary" => "Lets logged-in user flag page content"
 		);
 	}
 
-	public static function getModuleConfigInputfields(array $data) {
-		$fields = new InputfieldWrapper();
-
-		$modules = wire('modules');
-
-		$field = $modules->get("InputfieldText");
-		$field->attr('name', 'flaggingUserRoles');
-		$field->attr('value', $data['flaggingUserRoles']);
-		$field->label = "User roles that are allowed to flag";
-		$field->description = "";
-		$fields->add($field);
-
-		return $fields;
-
+	public function __construct() {
+		PWModuleConfigHelper::apply($this, self::$defaultConfig);
 	}
+
+
+	public static function getModuleConfigInputfields(array $data) {
+		return PWModuleConfigHelper::renderForm($data, self::$defaultConfig);
+	}
+
+	protected static $defaultConfig = array(
+		'allowedRoles'  => array(
+			'label' => 'User roles allowed to flag (use spaces to seperate entries)',
+			'value' => 'superuser',
+			'inputfieldType' => 'InputfieldText'
+		)
+	);
+
 
 	public function install() {
 
@@ -52,18 +54,22 @@ class FlagPages extends WireData implements Module {
 		 * Create flaggedpages field and assign it to user template
 		 */
 
-		$f = new Field();
-		$f->type = $this->modules->get("FieldtypePage");
-		$f->name = "flaggedpages";
-		$f->label = "Flagged Pages";
-		$f->description = "References to flagged pages ";
-		$f->save();
+		if(!$this->fields->get("flaggedpages")) {
 
-		$fg = $this->fieldgroups->get('user');
-		$fg->add($f);
-		$fg->save();
+			$f = new Field();
+			$f->type = $this->modules->get("FieldtypePage");
+			$f->name = "flaggedpages";
+			$f->label = "Flagged Pages";
+			$f->description = "References to flagged pages " . $this->awesomeSetting["label"];
+			$f->save();
 
-		$this->message("Module is installed");
+			$fg = $this->fieldgroups->get('user');
+			$fg->add($f);
+			$fg->save();
+
+			$this->message("Module is installed");
+
+		}
 
 	}
 
@@ -77,7 +83,6 @@ class FlagPages extends WireData implements Module {
 		$fg = $this->fieldgroups->get('user');
 		$fg->remove($fp);
 		$fg->save();
-		//$fp->delete(); @TODO delete flaggedpages completely
 
 		$this->message("Module is uninstalled");
 	}
@@ -96,6 +101,7 @@ class FlagPages extends WireData implements Module {
 		$pages = $this->pages;
 		$session = $this->session;
 		$userFlaggedPages = $this->user->flaggedpages;
+		$user_role_stack = array();
 
 		$add = ($add ? $add : "Add %s to flags");
 		$remove = ($remove ? $remove : "Remove %s from flags");
@@ -103,7 +109,15 @@ class FlagPages extends WireData implements Module {
 		$addLabel = sprintf($add, $page->title);
 		$removeLabel = sprintf($remove, $page->title);
 
-		if ($user->isLoggedin()) {
+		// Convert roles from module setting into array
+		$allowed_role_stack = explode(" ", $this->allowedRoles);
+
+		// Create simplified user role array in order to check intersection
+		foreach($user->roles as $role) {
+			array_push($user_role_stack, $role->name);
+		}
+
+		if ($user->isLoggedin() && (array_intersect($allowed_role_stack, $user_role_stack))) {
 
 			$label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
 
@@ -146,10 +160,11 @@ class FlagPages extends WireData implements Module {
 			}
 
 			echo "</ul>";
-		}
 
+		}
 	}
 
 	public function init() {}
+
 
 }
