@@ -18,46 +18,68 @@
  *
  */
 
+require_once 'includes/autoload.php';
+
 class FlagPages extends WireData implements Module, ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
 			"version" => 011,
-			"summary" => "Lets logged-in user flag page content",
-			"autoload" => false,
-			"singular" => false
+			"summary" => "Lets logged-in user flag page content"
 		);
 	}
 
-//	public function __construct() {
-//		foreach (self::$defaultSettings as $key => $value) {
-//			$this->set($key, $value);
-//		}
-//	}
+	public function __construct() {
+		PWModuleConfigHelper::apply($this, self::$defaultConfig);
+	}
 
-//	protected static $defaultSettings = array(
-//		'engine' => '',
-//		'api_var' => 'view',
-//		'registered_engines' => array(),
-//		'active' => true,
-//	);
 
 	public static function getModuleConfigInputfields(array $data) {
-		$fields = new InputfieldWrapper();
-
-		$modules = wire('modules');
-
-		$field = $modules->get("InputfieldAsmSelect");
-		$field->attr('name', 'flaggingUserRoles');
-		$field->attr('value', $data['flaggingUserRoles']);
-		$field->label = "User roles that are allowed to flag";
-		$field->description = "";
-		$fields->add($field);
-
-		return $fields;
-
+		return PWModuleConfigHelper::renderForm($data, self::$defaultConfig);
 	}
+
+	protected static $defaultConfig = array(
+
+		// example with just one option
+		'prettySetting'  => array(
+
+			// the label for the form
+			'label' => 'Pretty Setting',
+
+			// the default value
+			'value' => 'I am pretty',
+
+			// optional, defaults to 'InputfieldText'
+			'inputfieldType' => 'InputfieldText'
+		),
+
+		// example with multiple options
+		'awesomeSetting' => array(
+
+			// the label for the form
+			'label' => 'Awesome Setting',
+
+			// the default value
+			'value' => 2,
+
+			// optional, defaults to 'InputfieldRadios'
+			'inputfieldType' => 'InputfieldRadios',
+
+			// each key is for the input label, each value will be saved if selected
+			'options' => array(
+				'Option 1' => 1,
+				'Option 2' => 2,
+				'Option 3' => 3
+			),
+
+			// set any additional attribute to the input field
+			'attributes' => array(
+				'optionColumns' => 1
+			)
+		)
+	);
+
 
 	public function install() {
 
@@ -65,19 +87,13 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		 * Create flaggedpages field and assign it to user template
 		 */
 
-		$f = new Field();
-		$f->type = $this->modules->get("FieldtypePage");
-		$f->name = "flaggedpages";
-		$f->label = "Flagged Pages";
-		$f->description = "References to flagged pages ";
-		$f->save();
 		if(!$this->fields->get("flaggedpages")) {
 
 			$f = new Field();
 			$f->type = $this->modules->get("FieldtypePage");
 			$f->name = "flaggedpages";
 			$f->label = "Flagged Pages";
-			$f->description = "References to flagged pages ";
+			$f->description = "References to flagged pages " . $this->awesomeSetting["label"];
 			$f->save();
 
 			$fg = $this->fieldgroups->get('user');
