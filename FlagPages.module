@@ -40,43 +40,10 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 	}
 
 	protected static $defaultConfig = array(
-
-		// example with just one option
-		'prettySetting'  => array(
-
-			// the label for the form
-			'label' => 'Pretty Setting',
-
-			// the default value
-			'value' => 'I am pretty',
-
-			// optional, defaults to 'InputfieldText'
+		'allowedRoles'  => array(
+			'label' => 'User roles allowed to flag (use spaces to seperate entries)',
+			'value' => 'superuser',
 			'inputfieldType' => 'InputfieldText'
-		),
-
-		// example with multiple options
-		'awesomeSetting' => array(
-
-			// the label for the form
-			'label' => 'Awesome Setting',
-
-			// the default value
-			'value' => 2,
-
-			// optional, defaults to 'InputfieldRadios'
-			'inputfieldType' => 'InputfieldRadios',
-
-			// each key is for the input label, each value will be saved if selected
-			'options' => array(
-				'Option 1' => 1,
-				'Option 2' => 2,
-				'Option 3' => 3
-			),
-
-			// set any additional attribute to the input field
-			'attributes' => array(
-				'optionColumns' => 1
-			)
 		)
 	);
 
@@ -116,7 +83,6 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		$fg = $this->fieldgroups->get('user');
 		$fg->remove($fp);
 		$fg->save();
-		//$fp->delete(); @TODO delete flaggedpages completely
 
 		$this->message("Module is uninstalled");
 	}
@@ -135,6 +101,7 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		$pages = $this->pages;
 		$session = $this->session;
 		$userFlaggedPages = $this->user->flaggedpages;
+		$user_role_stack = array();
 
 		$add = ($add ? $add : "Add %s to flags");
 		$remove = ($remove ? $remove : "Remove %s from flags");
@@ -142,7 +109,15 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		$addLabel = sprintf($add, $page->title);
 		$removeLabel = sprintf($remove, $page->title);
 
-		if ($user->isLoggedin()) {
+		// Convert roles from module setting into array
+		$allowed_role_stack = explode(" ", $this->allowedRoles);
+
+		// Create simplified user role array in order to check intersection
+		foreach($user->roles as $role) {
+			array_push($user_role_stack, $role->name);
+		}
+
+		if ($user->isLoggedin() && (array_intersect($allowed_role_stack, $user_role_stack))) {
 
 			$label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
 
@@ -185,8 +160,8 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 			}
 
 			echo "</ul>";
-		}
 
+		}
 	}
 
 	public function init() {}
