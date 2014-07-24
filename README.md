@@ -1,4 +1,4 @@
-FlagPages 0.1.1
+FlagPages 0.2.0
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -11,7 +11,13 @@ Proof of concept - do not use in production environments without testing thoroug
 
 ## Usage
 
-FlagPages module consists of two parts: Rendering the link and rendering a list with your current bookmarks.
+On the module's config page you can set the user roles allowed to flag pages. Per default this ability is restricted to "superuser". If you are adding further roles, please seperate the entries with whitespace:
+
+```
+superuser editor foorule
+```
+
+On the markup side, FlagPages module consists of two parts: Rendering the link and rendering a list with your current bookmarks.
 
 First of all, load the module via:
 
@@ -64,6 +70,9 @@ Click "New" and search for `FlagPages` class name.
 https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
+
+### 0.2.0
+Added setting to limit flagging ability to certain user roles
 
 ### 0.1.1
 Simplified renderList() param logic (thanks, [teppo](https://processwire.com/talk/topic/7044-release-flagpages/#entry67965))
