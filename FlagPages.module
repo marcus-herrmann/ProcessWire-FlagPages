@@ -71,12 +71,22 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		$f->label = "Flagged Pages";
 		$f->description = "References to flagged pages ";
 		$f->save();
+		if(!$this->fields->get("flaggedpages")) {
 
-		$fg = $this->fieldgroups->get('user');
-		$fg->add($f);
-		$fg->save();
+			$f = new Field();
+			$f->type = $this->modules->get("FieldtypePage");
+			$f->name = "flaggedpages";
+			$f->label = "Flagged Pages";
+			$f->description = "References to flagged pages ";
+			$f->save();
 
-		$this->message("Module is installed");
+			$fg = $this->fieldgroups->get('user');
+			$fg->add($f);
+			$fg->save();
+
+			$this->message("Module is installed");
+
+		}
 
 	}
 
