@@ -18,7 +18,7 @@
  *
  */
 
-require_once 'includes/autoload.php';
+//require_once 'includes/autoload.php';
 
 class FlagPages extends WireData implements Module, ConfigurableModule {
 
@@ -30,22 +30,46 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		);
 	}
 
-	public function __construct() {
-		PWModuleConfigHelper::apply($this, self::$defaultConfig);
-	}
+	protected static $configDefaults = array(
+		// global
+		"allowedRoles" => ""
+	);
 
+	protected $data = array();
 
 	public static function getModuleConfigInputfields(array $data) {
-		return PWModuleConfigHelper::renderForm($data, self::$defaultConfig);
+
+		foreach(self::$configDefaults as $key => $value) {
+			if(!isset($data[$key]) || $data[$key]=='') $data[$key] = $value;
+		}
+
+		$wrapper = new InputfieldWrapper;
+
+		$f = wire('modules')->get("InputfieldAsmSelect");
+		$f->required = true;
+		$f->attr('name', 'allowedRoles');
+		$f->label = __('User roles allowed to flag');
+		$f->setAsmSelectOption('sortable', false);
+		if(isset($data['allowedRoles'])) $f->value = $data['allowedRoles'];
+
+		// populate with all available roles
+		foreach(wire('roles') as $roleoption) {
+			$f->addOption($roleoption->name);
+		}
+
+		$wrapper->add($f);
+
+		return $wrapper;
+
 	}
 
-	protected static $defaultConfig = array(
-		'allowedRoles'  => array(
-			'label' => 'User roles allowed to flag (use spaces to seperate entries)',
-			'value' => 'superuser',
-			'inputfieldType' => 'InputfieldText'
-		)
-	);
+//	protected static $defaultConfig = array(
+//		'allowedRoles'  => array(
+//			'label' => 'User roles allowed to flag (use spaces to seperate entries)',
+//			'value' => 'superuser',
+//			'inputfieldType' => 'InputfieldText'
+//		)
+//	);
 
 
 	public function install() {
