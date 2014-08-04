@@ -5,7 +5,7 @@
  * Flag Pages Module
  *
  * @author Marcus
- * https://github.com/marcus-herrmann/FlagPages
+ * https://github.com/marcus-herrmann/ProcessWire-FlagPages
  *
  * @date_created 07/19/2014
  *
@@ -18,62 +18,66 @@
  *
  */
 
-require_once 'includes/autoload.php';
-
 class FlagPages extends WireData implements Module, ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
-			"version" => 020,
+			"version" => 021,
 			"summary" => "Lets logged-in user flag page content"
 		);
 	}
 
-	public function __construct() {
-		PWModuleConfigHelper::apply($this, self::$defaultConfig);
-	}
-
-
 	public static function getModuleConfigInputfields(array $data) {
-		return PWModuleConfigHelper::renderForm($data, self::$defaultConfig);
+
+		$wrapper = new InputfieldWrapper;
+
+		$f = wire('modules')->get("InputfieldAsmSelect");
+		$f->required = true;
+		$f->attr('name', 'allowedRoles');
+		$f->label = __('User roles allowed to flag');
+		$f->setAsmSelectOption('sortable', false);
+		if(isset($data['allowedRoles'])) $f->value = $data['allowedRoles'];
+
+		// Populate with all available roles
+		foreach(wire('roles') as $roleoption) {
+
+			// Prevent guest
+			if ($roleoption->name != "guest") {
+				$f->addOption($roleoption->name);
+			}
+		}
+
+		$wrapper->add($f);
+
+		return $wrapper;
+
 	}
 
-	protected static $defaultConfig = array(
-		'allowedRoles'  => array(
-			'label' => 'User roles allowed to flag (use spaces to seperate entries)',
-			'value' => 'superuser',
-			'inputfieldType' => 'InputfieldText'
-		)
-	);
-
-
-	public function install() {
+	public function ___install() {
 
 		/*
-		 * Create flaggedpages field and assign it to user template
+		 * Create flaggedpages field if necessary and assign it to user template.
 		 */
 
 		if(!$this->fields->get("flaggedpages")) {
-
 			$f = new Field();
 			$f->type = $this->modules->get("FieldtypePage");
 			$f->name = "flaggedpages";
 			$f->label = "Flagged Pages";
-			$f->description = "References to flagged pages " . $this->awesomeSetting["label"];
+			$f->description = "References to flagged pages ";
 			$f->save();
-
-			$fg = $this->fieldgroups->get('user');
-			$fg->add($f);
-			$fg->save();
-
-			$this->message("Module is installed");
-
 		}
+
+		$fg = $this->fieldgroups->get('user');
+		$fg->add($this->fields->get("flaggedpages"));
+		$fg->save();
+
+		$this->message("Module is installed. Do not forget to grant flag permissions to user roles on the module settings page");
 
 	}
 
-	public function uninstall() {
+	public function ___uninstall() {
 
 		/*
  		* Delete flaggedpages field
@@ -87,13 +91,15 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		$this->message("Module is uninstalled");
 	}
 
-
-
-	public function renderLink($add, $remove) {
+	public function renderLink($add = "Add %s to flags", $remove = "Remove %s from flags") {
 
 		/*
 		 * Render link switch to flag/unflag pages
 		 */
+
+		if (!$this->allowedRoles) {
+			echo("You need to grant flagging permissions first!");
+		};
 
 		$user = $this->user;
 		$input = $this->input;
@@ -103,21 +109,18 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		$userFlaggedPages = $this->user->flaggedpages;
 		$user_role_stack = array();
 
-		$add = ($add ? $add : "Add %s to flags");
-		$remove = ($remove ? $remove : "Remove %s from flags");
-
 		$addLabel = sprintf($add, $page->title);
 		$removeLabel = sprintf($remove, $page->title);
 
-		// Convert roles from module setting into array
-		$allowed_role_stack = explode(" ", $this->allowedRoles);
 
 		// Create simplified user role array in order to check intersection
 		foreach($user->roles as $role) {
 			array_push($user_role_stack, $role->name);
 		}
 
-		if ($user->isLoggedin() && (array_intersect($allowed_role_stack, $user_role_stack))) {
+		if ($user->isLoggedin()
+			&& isset($this->data['allowedRoles'])
+			&& ((wire('user')->roles->has("name=".implode("|",$this->data['allowedRoles']))))) {
 
 			$label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
 
@@ -165,6 +168,5 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 	}
 
 	public function init() {}
-
 
 }

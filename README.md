@@ -1,4 +1,4 @@
-FlagPages 0.2.0
+FlagPages 0.2.1
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -30,7 +30,7 @@ $flags = $modules->get("FlagPages");
 Then, use the renderLink method and place the output in your template. By adding the link to all or just certain templates, you can control which templates can be flagged and which can't.
 
 ```
-echo $flag->renderLink();
+echo $flags->renderLink();
 ```
 
 The default output will be "Add {Name} to flags", or "Remove {Name} from flags". You can override these labels with parameters. For example:
@@ -70,6 +70,9 @@ Click "New" and search for `FlagPages` class name.
 https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
+
+### 0.2.1
+Using ASM select for chosing user roles with flagging permission
 
 ### 0.2.0
 Added setting to limit flagging ability to certain user roles
