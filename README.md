@@ -11,11 +11,7 @@ Proof of concept - do not use in production environments without testing thoroug
 
 ## Usage
 
-On the module's config page you can set the user roles allowed to flag pages. Per default this ability is restricted to "superuser". If you are adding further roles, please seperate the entries with whitespace:
-
-```
-superuser editor foorule
-```
+On the module's config page you can set the user roles allowed to flag pages. 
 
 On the markup side, FlagPages module consists of two parts: Rendering the link and rendering a list with your current bookmarks.
 
