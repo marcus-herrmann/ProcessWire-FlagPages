@@ -32,7 +32,7 @@ echo $flags->renderLink();
 The default output will be "Add {Name} to flags", or "Remove {Name} from flags". You can override these labels with parameters. For example:
 
 ```
-echo $flag->renderLink("Add %s to my bookmarks", "Remove %s from my bookmarks");
+echo $flags->renderLink("Add %s to my bookmarks", "Remove %s from my bookmarks");
 ```
 
 
