@@ -44,6 +44,13 @@ echo $flags->renderList();
 
 This will output a simple unordered list with links to pages the currently logged-in user has set a flag to.
 
+### Outputting the flagged pages count of the logged in user
+
+```
+echo $flags->showFlagCount();
+```
+
+Returns the count of flagged pages.
 
 ## Installation
 
