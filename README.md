@@ -1,4 +1,4 @@
-FlagPages 0.2.1
+FlagPages 0.2.2
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -79,6 +79,10 @@ Click "New" and search for `FlagPages` class name.
 https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
+
+### 0.2.2
+- Add method to return flagged pages count
+- Add option to insert HTML class names as renderList's parameter
 
 ### 0.2.1
 Using ASM select for chosing user roles with flagging permission
