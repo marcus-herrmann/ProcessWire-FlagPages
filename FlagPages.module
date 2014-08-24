@@ -145,7 +145,7 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		}
 	}
 
-	public function renderList() {
+	public function renderList($classes) {
 
 		/*
  		 * Provide a list for navigating to, and removing user's flags
@@ -156,7 +156,7 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 
 		if ($this->user->isLoggedin() && $userFlaggedPages) {
 
-			echo "<ul>";
+			echo "<ul class='{$classes}'>";
 
 			foreach($userFlaggedPages as $f) {
 				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a></li>";
