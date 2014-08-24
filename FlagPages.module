@@ -167,6 +167,16 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		}
 	}
 
+	public function showFlagCount() {
+
+		/*
+ 		 * Return count of currently flagged pages
+ 		 */
+
+		return count($this->user->flaggedpages);
+
+	}
+
 	public function init() {}
 
 }
