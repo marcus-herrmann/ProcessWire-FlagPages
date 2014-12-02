@@ -1,4 +1,4 @@
-FlagPages 0.2.2
+FlagPages 0.2.3
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -72,13 +72,15 @@ Click "New" and search for `FlagPages` class name.
 2. Go to modules overview page and click "Check for new modules"
 3. Install the module. The module will appear under "Flag" section.
 
-### By Module Class Name
-*Coming Soon*
-
 ## Forum topic
 https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
+
+### 0.2.3
+- Fixing module version number to prevent octal interpretation
+- Removing double class based installation method description in readme
+- Fixing method output - returning instead of echo'ing
 
 ### 0.2.2
 - Add method to return flagged pages count

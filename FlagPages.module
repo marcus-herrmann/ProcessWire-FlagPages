@@ -23,7 +23,7 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
-			"version" => 022,
+			"version" => 23,
 			"summary" => "Lets logged-in user flag page content"
 		);
 	}
@@ -119,12 +119,10 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 		}
 
 		if ($user->isLoggedin()
-			&& isset($this->data['allowedRoles'])
-			&& ((wire('user')->roles->has("name=".implode("|",$this->data['allowedRoles']))))) {
+		    && isset($this->data['allowedRoles'])
+		    && ((wire('user')->roles->has("name=".implode("|",$this->data['allowedRoles']))))) {
 
 			$label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
-
-			echo "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
 
 
 			if ($input->get("flag")) {
@@ -142,6 +140,9 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 				$session->redirect($pages->get($p)->url);
 
 			}
+
+			return "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
+
 		}
 	}
 
@@ -156,13 +157,15 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 
 		if ($this->user->isLoggedin() && $userFlaggedPages) {
 
-			echo "<ul class='{$classes}'>";
+			$list = "<ul class='{$classes}'>";
 
 			foreach($userFlaggedPages as $f) {
-				echo "<li><a href='" . $f->url . "'>" . $f->title . "</a></li>";
+				$list .= "<li><a href='" . $f->url . "'>" . $f->title . "</a></li>";
 			}
 
-			echo "</ul>";
+			$list .= "</ul>";
+
+			return $list;
 
 		}
 	}
@@ -173,7 +176,11 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
  		 * Return count of currently flagged pages
  		 */
 
-		return count($this->user->flaggedpages);
+		$userFlaggedPages = $this->user->flaggedpages;
+
+		if ($this->user->isLoggedin() && $userFlaggedPages) {
+			return count( $this->user->flaggedpages );
+		}
 
 	}
 
