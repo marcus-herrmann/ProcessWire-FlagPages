@@ -23,7 +23,7 @@ class FlagPages extends WireData implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			"title" => "FlagPages",
-			"version" => 022,
+			"version" => 23,
 			"summary" => "Lets logged-in user flag page content"
 		);
 	}
