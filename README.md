@@ -60,7 +60,7 @@ Returns the count of flagged pages.
 
 ## Installation
 
-* Requirement: ProcessWire 2.4 (although I haven't tested it in older versions, frankly)
+* Requirement: ProcessWire 2.4+
 
 ### Within module area in ProcessWire Backend
 
