@@ -45,7 +45,7 @@ echo $flags->renderList();
 This will output a simple unordered list with links to pages the currently logged-in user has set a flag to.
 
 ```
-echo $flages->renderList("classname foo bar");
+echo $flags->renderList("classname foo bar");
 ```
 
 Optional: If you would like to apply HTML classes on the generated unordered list, supply them as a string to the function's parameter.
