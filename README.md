@@ -1,4 +1,4 @@
-FlagPages 0.3.0
+FlagPages 1.0.0
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
