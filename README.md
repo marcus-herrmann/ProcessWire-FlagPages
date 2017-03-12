@@ -1,4 +1,4 @@
-FlagPages 0.2.3
+FlagPages 0.3.0
 =========
 
 Module for ProcessWire: lets logged-in users flag pages.
@@ -60,7 +60,7 @@ Returns the count of flagged pages.
 
 ## Installation
 
-* Requirement: ProcessWire 2.4+
+* Requirement: ProcessWire 3.x
 
 ### Within module area in ProcessWire Backend
 
@@ -76,6 +76,12 @@ Click "New" and search for `FlagPages` class name.
 https://processwire.com/talk/topic/7044-release-flagpages/
 
 ## Changelog
+
+### 1.0.0
+- Add PHP namespace to ensure compatibility with ProcessWire 3
+- Make classlist argument in renderList() method optional
+- Improve code comments
+- Make error output translatable
 
 ### 0.2.3
 - Fixing module version number to prevent octal interpretation

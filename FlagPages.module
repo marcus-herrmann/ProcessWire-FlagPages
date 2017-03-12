@@ -1,189 +1,194 @@
-<?php
+<?php namespace ProcessWire;
 
 /**
- *
+ * /**
  * Flag Pages Module
  *
- * @author Marcus
- * https://github.com/marcus-herrmann/ProcessWire-FlagPages
+ * See README.md for usage instructions.
  *
- * @date_created 07/19/2014
- *
- * ProcessWire 2.x
- * Copyright (C) 2011 by Ryan Cramer
- * Licensed under GNU/GPL v2, see LICENSE.TXT
- *
- * http://www.processwire.com
- * http://www.ryancramer.com
- *
+ * @author Marcus Herrmann <github@marcus-herrmann.com>
+ * @version 1.0.0
+ * @see https://github.com/marcus-herrmann/ProcessWire-FlagPages
+ * @see http://www.processwire.com
  */
 
-class FlagPages extends WireData implements Module, ConfigurableModule {
+class FlagPages extends WireData implements Module, ConfigurableModule
+{
 
-	public static function getModuleInfo() {
-		return array(
-			"title" => "FlagPages",
-			"version" => 23,
-			"summary" => "Lets logged-in user flag page content"
-		);
-	}
+    public static function getModuleInfo()
+    {
+        return array(
+            "title" => "FlagPages",
+            "version" => 100,
+            "summary" => "Lets logged-in user flag page content"
+        );
+    }
 
-	public static function getModuleConfigInputfields(array $data) {
+    public static function getModuleConfigInputfields(array $data)
+    {
 
-		$wrapper = new InputfieldWrapper;
+        $wrapper = new InputfieldWrapper;
 
-		$f = wire('modules')->get("InputfieldAsmSelect");
-		$f->required = true;
-		$f->attr('name', 'allowedRoles');
-		$f->label = __('User roles allowed to flag');
-		$f->setAsmSelectOption('sortable', false);
-		if(isset($data['allowedRoles'])) $f->value = $data['allowedRoles'];
+        $f = wire('modules')->get("InputfieldAsmSelect");
+        $f->required = true;
+        $f->attr('name', 'allowedRoles');
+        $f->label = __('User roles allowed to flag');
+        $f->setAsmSelectOption('sortable', false);
+        if (isset($data['allowedRoles'])) $f->value = $data['allowedRoles'];
 
-		// Populate with all available roles
-		foreach(wire('roles') as $roleoption) {
+        // Populate with all available roles
+        foreach (wire('roles') as $roleoption) {
 
-			// Prevent guest
-			if ($roleoption->name != "guest") {
-				$f->addOption($roleoption->name);
-			}
-		}
+            // Prevent guest
+            if ($roleoption->name != "guest") {
+                $f->addOption($roleoption->name);
+            }
+        }
 
-		$wrapper->add($f);
+        $wrapper->add($f);
 
-		return $wrapper;
+        return $wrapper;
 
-	}
+    }
 
-	public function ___install() {
+    public function ___install()
+    {
 
-		/*
-		 * Create flaggedpages field if necessary and assign it to user template.
-		 */
+        /*
+         * Create flaggedpages field if necessary and assign it to user template.
+         */
 
-		if(!$this->fields->get("flaggedpages")) {
-			$f = new Field();
-			$f->type = $this->modules->get("FieldtypePage");
-			$f->name = "flaggedpages";
-			$f->label = "Flagged Pages";
-			$f->description = "References to flagged pages ";
-			$f->save();
-		}
+        if (!$this->fields->get("flaggedpages")) {
+            $f = new Field();
+            $f->type = $this->modules->get("FieldtypePage");
+            $f->name = "flaggedpages";
+            $f->label = "Flagged Pages";
+            $f->description = "References to flagged pages ";
+            $f->save();
+        }
 
-		$fg = $this->fieldgroups->get('user');
-		$fg->add($this->fields->get("flaggedpages"));
-		$fg->save();
+        $fg = $this->fieldgroups->get('user');
+        $fg->add($this->fields->get("flaggedpages"));
+        $fg->save();
 
-		$this->message("Module is installed. Do not forget to grant flag permissions to user roles on the module settings page");
+        $this->message("Module is installed. Do not forget to grant flag permissions to user roles on the module settings page");
 
-	}
+    }
 
-	public function ___uninstall() {
+    public function ___uninstall()
+    {
 
-		/*
- 		* Delete flaggedpages field
- 		*/
+        /*
+         * Delete flaggedpages field
+         */
 
-		$fp = $this->fields->get("flaggedpages");
-		$fg = $this->fieldgroups->get('user');
-		$fg->remove($fp);
-		$fg->save();
+        $fp = $this->fields->get("flaggedpages");
+        $fg = $this->fieldgroups->get('user');
+        $fg->remove($fp);
+        $fg->save();
 
-		$this->message("Module is uninstalled");
-	}
+        $this->message("Module is uninstalled");
+    }
 
-	public function renderLink($add = "Add %s to flags", $remove = "Remove %s from flags") {
+    public function renderLink($add = "Add %s to flags", $remove = "Remove %s from flags")
+    {
 
-		/*
-		 * Render link switch to flag/unflag pages
-		 */
+        /*
+         * Render link switch to flag/unflag pages
+         */
 
-		if (!$this->allowedRoles) {
-			echo("You need to grant flagging permissions first!");
-		};
+        if (!$this->allowedRoles) {
+            echo __("You need to grant flagging permissions first!");
+        };
 
-		$user = $this->user;
-		$input = $this->input;
-		$page = $this->page;
-		$pages = $this->pages;
-		$session = $this->session;
-		$userFlaggedPages = $this->user->flaggedpages;
-		$user_role_stack = array();
+        $user = $this->user;
+        $input = $this->input;
+        $page = $this->page;
+        $pages = $this->pages;
+        $session = $this->session;
+        $userFlaggedPages = $this->user->flaggedpages;
+        $user_role_stack = array();
 
-		$addLabel = sprintf($add, $page->title);
-		$removeLabel = sprintf($remove, $page->title);
-
-
-		// Create simplified user role array in order to check intersection
-		foreach($user->roles as $role) {
-			array_push($user_role_stack, $role->name);
-		}
-
-		if ($user->isLoggedin()
-		    && isset($this->data['allowedRoles'])
-		    && ((wire('user')->roles->has("name=".implode("|",$this->data['allowedRoles']))))) {
-
-			$label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
+        $addLabel = sprintf($add, $page->title);
+        $removeLabel = sprintf($remove, $page->title);
 
 
-			if ($input->get("flag")) {
-				$p = $input->get("flag");
+        // Create simplified user role array in order to check intersection
+        foreach ($user->roles as $role) {
+            array_push($user_role_stack, $role->name);
+        }
 
-				$user->setOutputFormatting(false);
+        if ($user->isLoggedin()
+            && isset($this->data['allowedRoles'])
+            && ((wire('user')->roles->has("name=" . implode("|", $this->data['allowedRoles']))))
+        ) {
 
-				if ($userFlaggedPages->has($pages->get($p))) {
-					$userFlaggedPages->remove($pages->get($p));
-				} else {
-					$userFlaggedPages->add($pages->get($p));
-				}
-
-				$user->save();
-				$session->redirect($pages->get($p)->url);
-
-			}
-
-			return "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
-
-		}
-	}
-
-	public function renderList($classes) {
-
-		/*
- 		 * Provide a list for navigating to, and removing user's flags
- 		 */
-
-		$userFlaggedPages = $this->user->flaggedpages;
+            $label = ($userFlaggedPages->has($page) ? $removeLabel : $addLabel);
 
 
-		if ($this->user->isLoggedin() && $userFlaggedPages) {
+            if ($input->get("flag")) {
+                $p = $input->get("flag");
 
-			$list = "<ul class='{$classes}'>";
+                $user->setOutputFormatting(false);
 
-			foreach($userFlaggedPages as $f) {
-				$list .= "<li><a href='" . $f->url . "'>" . $f->title . "</a></li>";
-			}
+                if ($userFlaggedPages->has($pages->get($p))) {
+                    $userFlaggedPages->remove($pages->get($p));
+                } else {
+                    $userFlaggedPages->add($pages->get($p));
+                }
 
-			$list .= "</ul>";
+                $user->save();
+                $session->redirect($pages->get($p)->url);
 
-			return $list;
+            }
 
-		}
-	}
+            return "<a href='{$page->url}?flag={$page->id}'>{$label}</a>";
 
-	public function showFlagCount() {
+        }
+    }
 
-		/*
- 		 * Return count of currently flagged pages
- 		 */
+    public function renderList($classes = '')
+    {
 
-		$userFlaggedPages = $this->user->flaggedpages;
+        /*
+          * Provide a list for navigating to, and removing user's flags
+          */
 
-		if ($this->user->isLoggedin() && $userFlaggedPages) {
-			return count( $this->user->flaggedpages );
-		}
+        $userFlaggedPages = $this->user->flaggedpages;
 
-	}
 
-	public function init() {}
+        if ($this->user->isLoggedin() && $userFlaggedPages) {
+
+            $list = "<ul class='{$classes}'>";
+
+            foreach ($userFlaggedPages as $f) {
+                $list .= "<li><a href='" . $f->url . "'>" . $f->title . "</a></li>";
+            }
+
+            $list .= "</ul>";
+
+            return $list;
+
+        }
+    }
+
+    public function showFlagCount()
+    {
+
+        /*
+          * Return count of currently flagged pages
+          */
+
+        $userFlaggedPages = $this->user->flaggedpages;
+
+        if ($this->user->isLoggedin() && $userFlaggedPages) {
+            return count($this->user->flaggedpages);
+        }
+
+    }
+
+    public function init()
+    {
+    }
 
 }
